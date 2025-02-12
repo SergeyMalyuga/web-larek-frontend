@@ -1,12 +1,4 @@
-export interface IDataApi {
-	getProducts(): Promise<{ items: IItem[] }>;
-
-	getProduct(id: string): Promise<IItem>;
-
-	postOrder(data: IOrder): Promise<object>;
-}
-
-export interface IItem {
+export interface IProduct {
 	id: string,
 	description: string,
 	image: string,
@@ -16,8 +8,8 @@ export interface IItem {
 }
 
 export interface IProductModel {
-	items: IItem[];
-	getProducts(): IItem[];
+	items: IProduct[];
+	preview: string | null;
 }
 
 export interface IOrder {
@@ -30,13 +22,7 @@ export interface IOrder {
 }
 
 export interface IOrderModel {
-	fullOrder: IOrder;
-	payment: string,
-	email: string,
-	phone: string,
-	address: string,
-	total: number,
-	items: string[]
+	order: IOrder;
 }
 
 export interface IBasketModel {
@@ -49,11 +35,34 @@ export interface IBasketModel {
 	total: number;
 }
 
+export interface IEventEmitter {
+	emit: (event: string, data?: unknown) => void
+}
+
+export interface IModalProduct {
+	template: HTMLTemplateElement;
+}
+
+export interface IModalBasket {
+	template: HTMLTemplateElement;
+}
+
+export interface IModalOrder {
+	valid: boolean;
+	template: HTMLTemplateElement;
+}
+
+export interface IModalContacts {
+	valid: boolean;
+	template: HTMLTemplateElement;
+}
+
+export interface IModalSuccess {
+	template: HTMLTemplateElement;
+}
+
 export enum PaymentType {
 	CASH = 'cash',
 	CARD = 'card'
 }
 
-// type TItemInfo = Pick<IItem, 'description' | 'price'>;
-// type TOrderInfo = Pick<IOrder, 'payment' | 'address'>;
-// type IOrderUserInfo = Pick<IOrder, 'email' | 'phone'>;
