@@ -4,7 +4,7 @@ export interface IProduct {
 	image: string,
 	title: string,
 	category: string,
-	price: number
+	price: number | null
 }
 
 export interface IProductModel {
@@ -23,6 +23,7 @@ export interface IOrder {
 
 export interface IOrderModel {
 	order: IOrder;
+	isValid(order: IOrder): boolean;
 }
 
 export interface IBasketModel {
@@ -39,26 +40,46 @@ export interface IEventEmitter {
 	emit: (event: string, data?: unknown) => void
 }
 
-export interface IModalProduct {
-	template: HTMLTemplateElement;
+export interface IPage {
+	counter: number;
+	catalog: HTMLElement[];
 }
 
-export interface IModalBasket {
-	template: HTMLTemplateElement;
+export interface IModal {
+	open(): void;
+	close(): void;
+	render(): HTMLElement;
 }
 
-export interface IModalOrder {
+export interface IProductContent {
+	template: HTMLTemplateElement;
+	render(product: IProduct): HTMLElement;
+}
+
+export interface IBasketContent {
+	template: HTMLTemplateElement;
+	render(): HTMLElement;
+}
+
+export interface IOrderContent {
 	valid: boolean;
 	template: HTMLTemplateElement;
+	render(): HTMLElement;
 }
 
-export interface IModalContacts {
+export interface IContactsContent {
 	valid: boolean;
 	template: HTMLTemplateElement;
+	render(): HTMLElement;
 }
 
-export interface IModalSuccess {
+export interface ISuccessContent {
 	template: HTMLTemplateElement;
+	render(): HTMLElement;
+}
+
+export interface ICard {
+	render(data: IProduct): HTMLElement;
 }
 
 export enum PaymentType {
