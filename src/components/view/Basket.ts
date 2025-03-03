@@ -75,7 +75,6 @@ export class Basket implements IBasket {
 	}
 
 	render(): HTMLElement {
-		this.title.textContent = 'Корзина';
 		return this.basket;
 	}
 }

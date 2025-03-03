@@ -7,7 +7,7 @@ export interface IDataModel {
 	setPreview(item: IProduct): void;
 }
 
-export class DataModel implements IDataModel {
+export class ProductModel implements IDataModel {
 	protected _productCards: IProduct[];
 	selectedСard: IProduct;
 

@@ -98,6 +98,19 @@ export class FormModel implements IFormModel {
 		return Object.keys(errors).length === 0;
 	}
 
+	static validateForm(inputAll: HTMLInputElement[]): boolean {
+		let isValid = true;
+		inputAll.forEach(input => {
+			if (!input.value) {
+				isValid = false;
+				input.classList.add('input-error');
+			} else {
+				input.classList.remove('input-error');
+			}
+		});
+		return isValid;
+	}
+
 	getOrderLot() {
 		return {
 			payment: this.payment,

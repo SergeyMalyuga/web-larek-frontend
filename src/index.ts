@@ -6,7 +6,7 @@ import { CardPreview } from './components/view/CardPreview';
 import { FormModel } from './components/model/FormModel';
 import { ApiModel } from './components/model/ApiModel';
 import { EventEmitter } from './components/base/events';
-import { DataModel } from './components/model/DataModel';
+import { ProductModel } from './components/model/ProductModel';
 import { Modal } from './components/view/Modal';
 import { IOrderForm, IProduct } from './types';
 import { Basket } from './components/view/Basket';
@@ -37,7 +37,7 @@ const cardBasketTemplate = document.querySelector(
 
 const apiModel = new ApiModel(CDN_URL, API_URL);
 const events = new EventEmitter();
-const dataModel = new DataModel(events);
+const productModel = new ProductModel(events);
 const modal = new Modal(ensureElement<HTMLElement>('#modal-container'), events);
 const basket = new Basket(basketTemplate, events);
 const basketModel = new BasketModel();
@@ -48,12 +48,12 @@ const contacts = new Contacts(contactsTemplate, events);
 apiModel
 	.getProductCards()
 	.then(function (data: IProduct[]) {
-		dataModel.productCards = data;
+		productModel.productCards = data;
 	})
 	.catch((error) => console.log(error));
 
 events.on('cards:get', () => {
-	dataModel.productCards.forEach((item) => {
+	productModel.productCards.forEach((item) => {
 		const card = new Card(cardCatalogTemplate, events, {
 			onClick: () => events.emit('card:select', item),
 		});
@@ -62,7 +62,7 @@ events.on('cards:get', () => {
 });
 
 events.on('card:select', (item: IProduct) => {
-	dataModel.setPreview(item);
+	productModel.setPreview(item);
 });
 
 events.on('modalCard:open', (item: IProduct) => {
@@ -71,22 +71,24 @@ events.on('modalCard:open', (item: IProduct) => {
 	modal.render();
 });
 
+events.on('basket:change', () => {
+	basket.renderTotalProducts(basketModel.getTotalProducts());
+	basket.items = basketModel.basketProducts.map((item, index) => {
+		const basketItem = new BasketItem(cardBasketTemplate, events, {
+			onClick: () => events.emit('basket:basketItemRemove', item),
+		});
+		return basketItem.render(item, index + 1);
+	});
+})
+
 events.on('card:addBasket', () => {
-	basketModel.setSelectedСard(dataModel.selectedСard);
+	basketModel.setSelectedСard(productModel.selectedСard);
 	basket.renderBasketCounter(basketModel.getCounter());
+	events.emit('basket:change');
 	modal.close();
 });
 
 events.on('basket:open', () => {
-	basket.renderTotalProducts(basketModel.getTotalProducts());
-	let i = 0;
-	basket.items = basketModel.basketProducts.map((item) => {
-		const basketItem = new BasketItem(cardBasketTemplate, events, {
-			onClick: () => events.emit('basket:basketItemRemove', item),
-		});
-		i = i + 1;
-		return basketItem.render(item, i);
-	});
 	modal.content = basket.render();
 	modal.render();
 });
@@ -94,15 +96,7 @@ events.on('basket:open', () => {
 events.on('basket:basketItemRemove', (item: IProduct) => {
 	basketModel.deleteCardFromBasket(item);
 	basket.renderBasketCounter(basketModel.getCounter());
-	basket.renderTotalProducts(basketModel.getTotalProducts());
-	let i = 0;
-	basket.items = basketModel.basketProducts.map((item) => {
-		const basketItem = new BasketItem(cardBasketTemplate, events, {
-			onClick: () => events.emit('basket:basketItemRemove', item),
-		});
-		i = i + 1;
-		return basketItem.render(item, i);
-	});
+	events.emit('basket:change');
 });
 
 events.on('order:open', () => {
