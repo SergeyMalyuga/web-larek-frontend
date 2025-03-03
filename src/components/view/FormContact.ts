@@ -42,7 +42,7 @@ export class Contacts implements IContacts {
 	private handleSubmit(event: Event): void {
 		event.preventDefault();
 		if (FormModel.validateForm(this.inputAll)) {
-			this.events.emit('success:open');
+			this.events.emit('order:sending');
 		} else {
 			this.displayErrors();
 		}

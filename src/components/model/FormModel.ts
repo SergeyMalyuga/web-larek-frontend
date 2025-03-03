@@ -6,8 +6,7 @@ export interface IFormModel {
 	email: string;
 	phone: string;
 	address: string;
-	total: number;
-	items: string[];
+
 	setOrderAddress(field: string, value: string): void
 	validateOrder(): boolean;
 	setOrderData(field: string, value: string): void
@@ -20,8 +19,7 @@ export class FormModel implements IFormModel {
 	email: string;
 	phone: string;
 	address: string;
-	total: number;
-	items: string[];
+
 	formErrors: FormErrors = {};
 
 	constructor(protected events: IEvents) {
@@ -29,8 +27,6 @@ export class FormModel implements IFormModel {
 		this.email = '';
 		this.phone = '';
 		this.address = '';
-		this.total = 0;
-		this.items = [];
 	}
 
 	setOrderAddress(field: string, value: string) {
@@ -117,8 +113,6 @@ export class FormModel implements IFormModel {
 			email: this.email,
 			phone: this.phone,
 			address: this.address,
-			total: this.total,
-			items: this.items,
 		}
 	}
 }

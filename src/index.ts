@@ -8,7 +8,7 @@ import { ApiModel } from './components/model/ApiModel';
 import { EventEmitter } from './components/base/events';
 import { ProductModel } from './components/model/ProductModel';
 import { Modal } from './components/view/Modal';
-import { IOrderForm, IProduct } from './types';
+import { IOrderForm, IOrderLot, IProduct } from './types';
 import { Basket } from './components/view/Basket';
 import { BasketItem } from './components/view/BasketItem';
 import { ensureElement } from './utils/utils';
@@ -44,6 +44,7 @@ const basketModel = new BasketModel();
 const formModel = new FormModel(events);
 const order = new Order(orderTemplate, events);
 const contacts = new Contacts(contactsTemplate, events);
+const success = new Success(successTemplate, events);
 
 apiModel
 	.getProductCards()
@@ -79,7 +80,7 @@ events.on('basket:change', () => {
 		});
 		return basketItem.render(item, index + 1);
 	});
-})
+});
 
 events.on('card:addBasket', () => {
 	basketModel.setSelectedСard(productModel.selectedСard);
@@ -102,7 +103,6 @@ events.on('basket:basketItemRemove', (item: IProduct) => {
 events.on('order:open', () => {
 	modal.content = order.render();
 	modal.render();
-	formModel.items = basketModel.basketProducts.map((item) => item.id);
 });
 
 events.on('order:paymentSelection', (button: HTMLButtonElement) => {
@@ -122,7 +122,6 @@ events.on('formErrors:address', (errors: Partial<IOrderForm>) => {
 });
 
 events.on('contacts:open', () => {
-	formModel.total = basketModel.getTotalProducts();
 	modal.content = contacts.render();
 	modal.render();
 });
@@ -139,12 +138,16 @@ events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
 		.join('; ');
 });
 
-events.on('success:open', () => {
+events.on('order:sending', () => {
+	const payload: IOrderLot = {
+		...formModel.getOrderLot(),
+		total: basketModel.getTotalProducts(),
+		items: basketModel.basketProducts.map((product) => product.id),
+	};
 	apiModel
-		.postOrder(formModel.getOrderLot())
+		.postOrder(payload)
 		.then((data) => {
-			console.log(data);
-			const success = new Success(successTemplate, events);
+			success.render(data.total);
 			modal.content = success.render(basketModel.getTotalProducts());
 			basketModel.clearBasket();
 			basket.renderBasketCounter(basketModel.getCounter());
